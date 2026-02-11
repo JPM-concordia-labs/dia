@@ -10,7 +10,7 @@ model_checkpoint = "./models/dia-hf"
 output_path = "same_voice.mp3"
 
 # Use a fixed seed for repeatability.
-seed = 1234
+seed = 333
 
 # Keep this transcript exactly aligned with the reference audio.
 reference_audio_path = "simple.mp3"
@@ -21,8 +21,11 @@ reference_transcript = (
     "[S2] Try it now on Git hub or Hugging Face."
 )
 text_to_generate = (
-    "[S1] Hi, this is a same-voice test. "
-    "[S2] Great, let's keep the same speaker style in this output."
+    "[S1] Hi, this is a same-voice consistency test. "
+    "[S2] Great, I will keep the same voice and speaking style throughout this clip. "
+    "[S1] Perfect, please continue with one more complete sentence so we can verify both speakers. "
+    "[S2] Absolutely, this second speaker line should be clearly present in the final audio. "
+    "[S1]"
 )
 
 processor = AutoProcessor.from_pretrained(model_checkpoint)
@@ -32,15 +35,14 @@ torch.manual_seed(seed)
 if torch.cuda.is_available():
     torch.cuda.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
-generator = torch.Generator(device=torch_device).manual_seed(seed)
 
 generation_kwargs = dict(
     max_new_tokens=3072,
+#    min_new_tokens=700,
     guidance_scale=3.0,
-    temperature=1.0,
+    temperature=2.0,
     top_p=0.90,
-    top_k=45,
-    generator=generator,
+    top_k=40,
 )
 
 if os.path.exists(reference_audio_path):
